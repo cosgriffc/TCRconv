@@ -37,7 +37,7 @@ def get_protseqs_ntseqs(chain='B'):
     """returns sequence dictioaries for genes: protseqsV, protseqsJ, nucseqsV, nucseqsJ"""
     seq_dicts=[]
     for gene,type in zip(['v','j','v','j'],['aa','aa','nt','nt']):
-        name = 'preprocessing/data/'+'tr'+chain.lower()+gene+'s_'+type+'.tsv'
+        name = './data/'+'tr'+chain.lower()+gene+'s_'+type+'.tsv'
         sdict = file2dict(name,key_fields=['Allele'],store_fields=[type+'_seq'])
         for g in sdict:
             sdict[g]=sdict[g][0][0]
@@ -203,13 +203,19 @@ def get_tcr_dict(filename,chain='B', min_tcrs_per_epi=50,skip_mi=True,species='H
                 td[epitope].append(tcrs_vdj_all[species][idx][epitope]['TRA'][0][0:3]\
                                    +tcrs_vdj_all[species][idx][epitope]['TRB'][0])
     else:
-        tcrs_vdj_all = file2dict(filename,['Species','Epitope','Gene'],\
-                                 ['CDR3','V','J','Reference','Meta','Score','MHC A','MHC B'])
+        tcrs_vdj_all = file2dict(filename,['species','antigen.epitope','gene'],\
+                                 ['cdr3','v.segm','j.segm','reference.id','meta','vdjdb.score','mhc.a','mhc.b'])
         td = {}
         for epitope in tcrs_vdj_all[species]:
             if epitope not in td:
                     td[epitope]=[]
-            td[epitope]=tcrs_vdj_all[species][epitope]['TR'+chain]
+            
+            # added this logic since our changes are querying epitopes which do not always have an associated TRB
+            # and the existing code doesn't seem to have to deal with this; perhpas they pre-cleaned their inputs in past
+            if 'TR'+chain in tcrs_vdj_all[species][epitope].keys():
+                td[epitope]=tcrs_vdj_all[species][epitope]['TR'+chain]
+            else:
+                td[epitope]=""
 
     num_entries = 7 if chain=='AB' else 4
     tcrs_vdj = {}

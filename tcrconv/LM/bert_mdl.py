@@ -29,7 +29,8 @@ class ProtBertClassifier(pl.LightningModule):
 
     def __init__(self, hparams) -> None:
         super(ProtBertClassifier, self).__init__()
-        self.hparams = hparams
+        #self.hparams = hparams
+        self.save_hyperparameters(hparams)
         self.batch_size = 32
 
         self.modelFolderPath ='LM/ProtBert/'

@@ -525,7 +525,7 @@ def extract_and_save_embeddings(model=None, data_f_n="vdj_human_unique_longs.csv
         else:
             cropped_seqs.append(' '.join(list(l)))
         sequences.append(l)
-    inputs = model.tokenizer.batch_encode_plus(cropped_seqs[:10],
+    inputs = model.tokenizer.batch_encode_plus(cropped_seqs,
                                                add_special_tokens=False,
                                                padding=True,
                                                truncation=True,
@@ -550,7 +550,6 @@ def extract_and_save_embeddings(model=None, data_f_n="vdj_human_unique_longs.csv
         current_inputs['attention_mask'] = inputs['attention_mask'][i * 100:(i + 1) * 100]
         embedding = model.forward(**current_inputs)
         pickle.dump([seqs[:10], embedding[:10]], open("check_embs.bin", "wb"))
-        exit(1)
         embedding = embedding.cpu().numpy()
         print("{} sequences have been extracted".format(i * 100))
         for seq_num in range(len(embedding)):
